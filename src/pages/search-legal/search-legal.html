@@ -1,0 +1,54 @@
+<!--
+  Generated template for the SearchLegal page.
+
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Поиск юридических лиц</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content padding>
+  <ion-searchbar (ionBlur)="search($event.target.value)" placeholder="Введите название..."></ion-searchbar>
+  <span *ngIf="requestedQuery">
+    Результаты по запросу: 
+    <i>"{{ requestedQuery }}"</i>
+  </span>
+  <ion-card *ngFor="let result of suggestions" (tap)="cardTap(result)">
+
+    <ion-card-header>
+      <ion-icon name="arrow-dropdown" *ngIf="!result._opened"></ion-icon>
+      <ion-icon name="arrow-dropup" *ngIf="result._opened"></ion-icon>
+      {{ result?.value }}
+    </ion-card-header>
+
+    <ion-card-content *ngIf="result._opened">
+      <h2>Реквизиты</h2>
+      <div>
+        <span>ИНН: </span>
+        <b>{{ result.data.inn }}</b>
+      </div>
+      <div>
+        <span>КПП: </span>
+        <b>{{ result.data.kpp }}</b>
+      </div>
+      <div>
+        <span>ОГРН: </span>
+        <b>{{ result.data.ogrn }}</b>
+      </div>
+      <h2>Управление</h2>
+      <div>
+        <span>{{ result.data.management.post }}: </span>
+        <b>{{ result.data.management.name }}</b>
+      </div>
+    </ion-card-content>
+
+  </ion-card>
+</ion-content>
