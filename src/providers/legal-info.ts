@@ -13,27 +13,41 @@ import 'rxjs/add/operator/map';
 */
 @Injectable()
 export class LegalInfo {
-  githubApiUrl = 'http://www.list-org.com/search.php?type=inn&val=';
+    public static API_KEY: string = '760b23a7f3722dfa119a4e16d237c6919aeaa52e';
+    public static API_URL: string = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest';
+    headers: Headers;
 
-  constructor(public http: Http) { }
+  constructor(public http: Http) {
+    this.headers = new Headers();
+    this.headers.append('Content-Type', 'application/json');
+    this.headers.append('Accept', 'application/json');
+    this.headers.append('Authorization', `Token ${ LegalInfo.API_KEY }`);
+  }
 
-  getByName(name): Observable<Suggestion[]> {
-    // const requestedUrl = `${this.githubApiUrl}${name}`;
-    const requestedUrl = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/party';
-    const headers = new Headers();
+  getByFIO(fio): Observable<Suggestion[]> {
+    return this.request(`${ LegalInfo.API_URL }/fio`, fio);
+  }
 
-    headers.append('Content-Type', 'application/json');
-    headers.append('Accept', 'application/json');
-    headers.append('Authorization', 'Token 760b23a7f3722dfa119a4e16d237c6919aeaa52e');
+  getByAddress(address): Observable<Suggestion[]> {
+    return this.request(`${ LegalInfo.API_URL }/address`, address);
+  }
 
+  getByBank(bank): Observable<Suggestion[]> {
+    return this.request(`${ LegalInfo.API_URL }/bank`, bank);
+  }
 
-    console.log(requestedUrl)
-    // return this.http.get(requestedUrl)
-    //   .map(res => <User[]>res.json());
-    // let headers = new Headers({ 'Content-Type': 'application/json' });
-    const options = new RequestOptions({ headers: headers });
+  getByEmail(email): Observable<Suggestion[]> {
+    return this.request(`${ LegalInfo.API_URL }/email`, email);
+  }
+    
+  getByOrgName(name): Observable<Suggestion[]> {
+    return this.request(`${ LegalInfo.API_URL }/party`, name);
+  }
 
-    return this.http.post(requestedUrl, { query: name }, options)
+  private request(url, query) {
+    const options = new RequestOptions({ headers: this.headers });
+console.log(url, query)
+    return this.http.post(url, { query }, options)
       .map(res => <Suggestion[]>res.json().suggestions);
   }
 

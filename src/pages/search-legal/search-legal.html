@@ -16,12 +16,24 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-searchbar (ionBlur)="search($event.target.value)" placeholder="Введите название..."></ion-searchbar>
+  <ion-list>
+    <ion-item>
+      <ion-label>Поиск по:</ion-label>
+      <ion-select [(ngModel)]="searchingObject" (ionChange)="search(searchingQuery, searchingObject)">
+        <!--<ion-option value="FIO">ФИО</ion-option>-->
+        <!--<ion-option value="ADDRESS">Адресу</ion-option>-->
+        <ion-option value="ORG">организациям</ion-option>
+        <ion-option value="BANK">банкам</ion-option>
+        <!--<ion-option value="EMAIL">Email</ion-option>-->
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  <ion-searchbar (ionBlur)="search(searchingQuery, searchingObject)" [(ngModel)]="searchingQuery" placeholder="Введите название..."></ion-searchbar>
   <span *ngIf="requestedQuery">
     Результаты по запросу: 
     <i>"{{ requestedQuery }}"</i>
   </span>
-  <ion-card *ngFor="let result of suggestions" (tap)="cardTap(result)">
+  <ion-card *ngFor="let result of suggestions" (tap)="toogleCard(result)">
 
     <ion-card-header>
       <ion-icon name="arrow-dropdown" *ngIf="!result._opened"></ion-icon>
@@ -30,25 +42,54 @@
     </ion-card-header>
 
     <ion-card-content *ngIf="result._opened">
-      <h2>Реквизиты</h2>
-      <div>
+
+      <h2 class="section-name">Реквизиты</h2>
+      <div class="section-row" *ngIf="result.data.inn">
         <span>ИНН: </span>
         <b>{{ result.data.inn }}</b>
       </div>
-      <div>
+      <div class="section-row" *ngIf="result.data.kpp">
         <span>КПП: </span>
         <b>{{ result.data.kpp }}</b>
       </div>
-      <div>
+      <div class="section-row" *ngIf="result.data.ogrn">
         <span>ОГРН: </span>
         <b>{{ result.data.ogrn }}</b>
       </div>
-      <h2>Управление</h2>
-      <div>
+      <!-- Банк -->
+      <div class="section-row" *ngIf="result.data.correspondent_account">
+        <span>Корр. счет: </span>
+        <b>{{ result.data.correspondent_account }}</b>
+      </div>
+      <div class="section-row" *ngIf="result.data.okpo">
+        <span>ОКПО: </span>
+        <b>{{ result.data.okpo }}</b>
+      </div>
+      <div class="section-row" *ngIf="result.data.registration_number">
+        <span>Регистрационный номер: </span>
+        <b>{{ result.data.registration_number }}</b>
+      </div>
+      <div class="section-row" *ngIf="result.data.swift">
+        <span>Swift-код: </span>
+        <b>{{ result.data.swift }}</b>
+      </div>
+      <!---->
+
+      <h2 class="section-name" *ngIf="result.data.management">Управление</h2>
+      <div class="section-row" *ngIf="result.data.management">
         <span>{{ result.data.management.post }}: </span>
         <b>{{ result.data.management.name }}</b>
+      </div>
+
+      <h2 class="section-name">Местонахождение</h2>
+      <div class="section-row" *ngIf="result.data.address">
+        <span>Адрес: </span>
+        <b>{{ result.data.address.value }}</b>
       </div>
     </ion-card-content>
 
   </ion-card>
+  <div [hidden]="suggestions?.length" class="logo-container" padding>
+    <img class="logo" item-center src="../assets/images/logo-vbc.png">
+  </div>
 </ion-content>

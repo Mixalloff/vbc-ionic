@@ -1,3 +1,5 @@
+import { ToastController } from 'ionic-angular/components/toast/toast';
+import { Observable } from 'rxjs/Rx';
 import { Suggestion } from './../../models/suggestion';
 import { LegalInfo } from '../../providers/legal-info';
 import { Component } from '@angular/core';
@@ -17,22 +19,40 @@ export class SearchLegalPage {
 
   suggestions: Suggestion[];
   requestedQuery: any;
+  searchingObject: string;
+  searchingQuery: string;
 
-  constructor(public navCtrl: NavController, private legalInfo: LegalInfo) {
-    // const inn = 7710140679;
-    
+  constructor(public navCtrl: NavController, private legalInfo: LegalInfo, private toastCtrl: ToastController) {
+    this.searchingQuery = '';
   }
 
-  search(query) {
+  search(query, searchingObject) {
+    if (!query) return;
+    if (!searchingObject) {
+      let toast = this.toastCtrl.create({
+        message: 'Выберите тип для поиска',
+        duration: 3000
+      });
+      
+      toast.present();
+      return;
+    }
+
     this.requestedQuery = query;
+    let method: Observable<Suggestion[]>;
 
-    this.legalInfo.getByName(query).subscribe(suggestions => {
-      console.log(suggestions);
-      this.suggestions = suggestions;
-    })
+    switch(searchingObject) {
+      case 'FIO'     : { method = this.legalInfo.getByFIO(query); break; }
+      case 'ADDRESS' : { method = this.legalInfo.getByAddress(query); break; }
+      case 'ORG'     : { method = this.legalInfo.getByOrgName(query); break; }
+      case 'BANK'    : { method = this.legalInfo.getByBank(query); break; }
+      case 'EMAIL'   : { method = this.legalInfo.getByEmail(query); break; }
+    }
+
+    method.subscribe(suggestions => this.suggestions = suggestions);
   }
 
-  cardTap(suggestion) {
+  toogleCard(suggestion) {
     suggestion._opened = !suggestion._opened;
   }
 
